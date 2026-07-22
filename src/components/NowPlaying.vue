@@ -49,6 +49,11 @@ import Clock from "./Clock.vue"
 import * as Vibrant from "node-vibrant"
 
 import props from "@/utils/props.js"
+import {
+  fetchCurrentlyPlaying,
+  getEmptyPlayer,
+  normalizeCurrentlyPlaying
+} from "@/services/spotify.js"
 
 export default {
   name: "NowPlaying",
@@ -68,8 +73,6 @@ export default {
   data() {
     return {
       pollPlaying: "",
-      playerResponse: {},
-      playerData: this.getEmptyPlayer(),
       colourPalette: "",
       swatches: []
     }
@@ -85,43 +88,28 @@ export default {
 
   methods: {
     async getNowPlaying() {
-      let data = {}
-
       try {
-        const response = await fetch(
-          `${this.endpoints.base}/${this.endpoints.nowPlaying}`,
-          {
-            headers: {
-              Authorization: `Bearer ${this.auth.accessToken}`
-            }
-          }
+        const response = await fetchCurrentlyPlaying(
+          this.auth.accessToken,
+          this.endpoints
         )
 
-        if (!response.ok) {
-          throw new Error(`An error has occurred: ${response.status}`)
-        }
+        const data = normalizeCurrentlyPlaying(response)
 
-        if (response.status === 204) {
-          data = this.getEmptyPlayer()
-          this.playerData = data
+        this.$emit("spotifyTrackUpdated", data)
 
-          this.$nextTick(() => {
-            this.$emit("spotifyTrackUpdated", data)
-          })
-
-          return
-        }
-
-        data = await response.json()
-        this.playerResponse = data
+        this.$nextTick(() => {
+          this.getAlbumColours()
+        })
       } catch (error) {
         this.handleExpiredToken()
 
-        data = this.getEmptyPlayer()
-        this.playerData = data
+        const data = getEmptyPlayer()
+
+        this.$emit("spotifyTrackUpdated", data)
 
         this.$nextTick(() => {
-          this.$emit("spotifyTrackUpdated", data)
+          this.getAlbumColours()
         })
       }
     },
@@ -146,16 +134,6 @@ export default {
         })
     },
 
-    getEmptyPlayer() {
-      return {
-        playing: false,
-        trackAlbum: {},
-        trackArtists: [],
-        trackId: "",
-        trackTitle: ""
-      }
-    },
-
     setDataInterval() {
       clearInterval(this.pollPlaying)
 
@@ -174,38 +152,6 @@ export default {
         "--colour-background-now-playing",
         this.colourPalette.background
       )
-    },
-
-    handleNowPlaying() {
-      if (
-        this.playerResponse.error?.status === 401 ||
-        this.playerResponse.error?.status === 400
-      ) {
-        this.handleExpiredToken()
-        return
-      }
-
-      if (this.playerResponse.is_playing === false) {
-        this.playerData = this.getEmptyPlayer()
-        return
-      }
-
-      if (this.playerResponse.item?.id === this.playerData.trackId) {
-        return
-      }
-
-      this.playerData = {
-        playing: this.playerResponse.is_playing,
-        trackArtists: this.playerResponse.item.artists.map(
-          artist => artist.name
-        ),
-        trackTitle: this.playerResponse.item.name,
-        trackId: this.playerResponse.item.id,
-        trackAlbum: {
-          title: this.playerResponse.item.album.name,
-          image: this.playerResponse.item.album.images[0].url
-        }
-      }
     },
 
     handleAlbumPalette(palette) {
@@ -239,16 +185,14 @@ export default {
       }
     },
 
-    playerResponse() {
-      this.handleNowPlaying()
-    },
-
-    playerData() {
-      this.$emit("spotifyTrackUpdated", this.playerData)
-
-      this.$nextTick(() => {
-        this.getAlbumColours()
-      })
+    player: {
+      handler() {
+        this.$nextTick(() => {
+          this.getAlbumColours()
+        })
+      },
+      deep: true,
+      immediate: true
     }
   }
 }
