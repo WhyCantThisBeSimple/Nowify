@@ -37,11 +37,13 @@
     >
       <div class="now-playing__idle-background"></div>
 
-      <Clock />
+      <div class="now-playing__idle-content">
+        <Clock />
 
-      <h1 class="now-playing__idle-message">
-        No music is playing 😔
-      </h1>
+        <p class="now-playing__idle-message">
+          Waiting for music…
+        </p>
+      </div>
     </div>
   </div>
 </template>
