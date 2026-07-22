@@ -1,71 +1,114 @@
 /**
  * Component: Now Playing.
  * -----------------------------------------------------------------------------
- * Styles for the 'Now Playing' screen.
- *
+ * Styles for the Now Playing screen.
  */
+
 .now-playing {
+  position: relative;
+  overflow: hidden;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 4rem;
+
   background-color: var(--colour-background-now-playing);
   color: var(--color-text-primary);
-  display: flex;
-  flex-flow: column nowrap;
-  height: 100%;
-  padding: var(--spacing-l);
-  width: 100%;
 
-  &__cover,
-  &__details {
-    padding: var(--spacing-m);
-    text-align: center;
-    width: 100%;
+  &__background {
+    position: absolute;
+    inset: 0;
+
+    background-size: cover;
+    background-position: center;
+
+    filter: blur(60px);
+    transform: scale(1.3);
+    opacity: .35;
+
+    z-index: 0;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, .55);
+    }
   }
 
-  &__cover {
-    max-width: 400px;
-  }
+  &__content {
+    position: relative;
+    z-index: 2;
 
-  &__image {
-    box-shadow: 1px 1px 16px -2px rgba(0, 0, 0, .3);
-    height: auto;
-    max-width: 60vw;
-    width: 100%;
-  }
+    display: grid;
+    grid-template-columns: 500px 1fr;
+    gap: 3rem;
 
-  &__details {
-    text-align: center;
-  }
-
-  &__track {
-    font-weight: var(--font-weight-heading);
-  }
-
-  &__artists {
-    opacity: 0.8;
-  }
-
-  &--active {
     align-items: center;
+
+    width: 100%;
+    height: 100%;
+  }
+
+  &__left {
+    display: flex;
     justify-content: center;
+    align-items: center;
+  }
+
+  &__right {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    width: 100%;
+    height: 100%;
+  }
+
+  &__track-info {
+    flex: 1;
+
+    display: flex;
+    align-items: center;
+  }
+
+  &__idle-message {
+    position: relative;
+    z-index: 2;
+
+    font-size: 2rem;
+    text-align: center;
+    opacity: .75;
   }
 
   &--idle {
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
   }
 
-  @media only screen and (min-width: 767px) {
-    flex-flow: row nowrap;
-    padding: 10%;
+  @media (max-width: 900px) {
+    padding: 2rem;
 
-    &__cover,
-    &__details {
-      width: 50%;
-      max-width: 495px;
+    &__content {
+      grid-template-columns: 1fr;
+      gap: 2rem;
     }
 
-    &__details {
-      text-align: left;
+    &__left,
+    &__right {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    &__track-info {
+      justify-content: center;
+    }
+
+    .clock {
+      align-self: center;
     }
   }
 }

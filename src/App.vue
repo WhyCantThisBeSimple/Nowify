@@ -31,6 +31,7 @@ export default {
     return {
       storedAuth: '',
       test: 'hello, world',
+      isDevelopment: process.env.NODE_ENV === 'development',
       auth: {
         status: false,
         clientId: process.env.VUE_APP_SP_CLIENT_ID,
@@ -62,8 +63,12 @@ export default {
      * @return {String}
      */
     getCurrentComponent() {
-      return this.auth.status === false ? 'Authorise' : 'NowPlaying'
-    }
+  if (this.isDevelopment) {
+    return 'NowPlaying'
+  }
+      
+  return this.auth.status === false ? 'Authorise' : 'NowPlaying'
+}
   },
 
   created() {
@@ -73,7 +78,26 @@ export default {
     }
   },
 
-  mounted() {},
+  mounted() {
+  console.log("Client ID:", this.auth.clientId)
+  console.log("Client Secret exists:", !!this.auth.clientSecret)
+
+  if (!this.isDevelopment) {
+    return
+  }
+
+  this.player = {
+    playing: true,
+    trackArtists: ["Fleetwood Mac"],
+    trackTitle: "Dreams",
+    trackAlbum: {
+      title: "Rumours",
+      image: "https://picsum.photos/600"
+    }
+  }
+
+  this.auth.status = true
+},
 
   methods: {
     /**
