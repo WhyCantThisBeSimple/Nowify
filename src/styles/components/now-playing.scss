@@ -81,10 +81,22 @@
     padding-top: 1rem;
   }
 
+  &__idle-background {
+    position: absolute;
+    inset: 0;
+
+    background:
+      radial-gradient(circle at top, rgba(255, 255, 255, .06), transparent 42%),
+      linear-gradient(180deg, #191919 0%, #0d0d0d 100%);
+
+    z-index: 0;
+  }
+
   &__idle-message {
     position: relative;
     z-index: 2;
 
+    margin: 0;
     font-size: 2rem;
     text-align: center;
     opacity: .75;
@@ -92,8 +104,10 @@
 
   &--idle {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 1rem;
   }
 
   @media (max-width: 900px) {

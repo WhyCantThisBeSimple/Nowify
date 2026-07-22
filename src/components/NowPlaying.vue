@@ -35,6 +35,10 @@
       v-else
       class="now-playing now-playing--idle"
     >
+      <div class="now-playing__idle-background"></div>
+
+      <Clock />
+
       <h1 class="now-playing__idle-message">
         No music is playing 😔
       </h1>
