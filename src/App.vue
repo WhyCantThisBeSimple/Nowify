@@ -50,7 +50,7 @@ export default {
         playing: false,
         trackArtists: [],
         trackTitle: '',
-        trackAlbum: []
+        trackAlbum: {}
       },
       storedId: ''
     }

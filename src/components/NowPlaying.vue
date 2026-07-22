@@ -79,7 +79,10 @@ export default {
   },
 
   mounted() {
-    // this.setDataInterval()
+    if (this.auth.status && this.auth.accessToken) {
+      this.getNowPlaying()
+      this.setDataInterval()
+    }
   },
 
   beforeDestroy() {
@@ -180,9 +183,13 @@ export default {
 
   watch: {
     auth(newVal) {
-      if (newVal.status === false) {
-        clearInterval(this.pollPlaying)
+      if (newVal.status === true && newVal.accessToken) {
+        this.getNowPlaying()
+        this.setDataInterval()
+        return
       }
+
+      clearInterval(this.pollPlaying)
     },
 
     player: {
