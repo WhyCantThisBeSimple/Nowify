@@ -111,7 +111,16 @@ export default {
      * Request a refresh token from Spotify.
      */
     requestRefreshTokens() {
+      this.auth.accessToken = ''
+      this.auth.authCode = ''
       this.auth.status = false
+
+      this.player = {
+        playing: false,
+        trackArtists: [],
+        trackTitle: '',
+        trackAlbum: {}
+      }
     },
 
     /**
