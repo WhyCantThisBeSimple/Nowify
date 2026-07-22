@@ -85,6 +85,18 @@ export default {
      * Request the initial access and refresh tokens from Spotify.
      */
     async requestAccessTokens(grantType = 'authorization_code') {
+      if (!this.auth.clientId || !this.auth.clientSecret) {
+        return
+      }
+
+      if (grantType === 'authorization_code' && !this.auth.authCode) {
+        return
+      }
+
+      if (grantType === 'refresh_token' && !this.auth.refreshToken) {
+        return
+      }
+
       let fetchData = {
         grant_type: grantType
       }
@@ -128,6 +140,11 @@ export default {
        * Auth token expired.
        */
       if (accessTokenResponse.error?.error === 'invalid_grant') {
+        this.auth.accessToken = ''
+        this.auth.refreshToken = ''
+        this.auth.authCode = ''
+        this.auth.status = false
+
         return
       }
 
@@ -135,6 +152,8 @@ export default {
        * Access Token has expired.
        */
       if (accessTokenResponse.error?.status === 401) {
+        this.auth.accessToken = ''
+        this.auth.refreshToken = ''
         this.auth.authCode = ''
         this.auth.status = false
 
@@ -211,15 +230,6 @@ export default {
      */
     'auth.authCode': function() {
       this.requestAccessTokens()
-    },
-
-    /**
-     * Watch authorisation status.
-     */
-    'auth.status': function() {
-      if (this.auth.refreshToken) {
-        this.requestAccessTokens('refresh_token')
-      }
     }
   }
 }
