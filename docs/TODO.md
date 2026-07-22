@@ -3,6 +3,7 @@
 ## High Priority
 
 - [ ] Perfect desktop layout
+- [ ] Review reference screenshot and refine the desktop layout to match the target look
 - [ ] Improve spacing
 - [ ] Improve typography
 - [ ] Better alignment
@@ -15,6 +16,8 @@
 - [ ] Re-enable Spotify login
 - [ ] Test token refresh
 - [ ] Test currently playing updates
+- [ ] Stop re-showing the Spotify login screen for already-authenticated users
+- [ ] Verify auth persistence across reloads and session restoration
 
 ---
 
@@ -26,6 +29,7 @@
 - [ ] Better background overlay
 - [ ] Rounded artwork shadows
 - [ ] Dynamic colour improvements
+- [ ] Only update background colours when the track changes
 
 ---
 

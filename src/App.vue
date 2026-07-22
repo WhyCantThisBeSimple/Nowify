@@ -28,17 +28,19 @@ export default {
   props: {},
 
   data() {
+    const storedAuth = getStoredAuth()
+
     return {
       storedAuth: '',
       test: 'hello, world',
       isDevelopment: process.env.NODE_ENV === 'development',
       auth: {
-        status: false,
+        status: Boolean(storedAuth.status),
         clientId: process.env.VUE_APP_SP_CLIENT_ID,
         clientSecret: process.env.VUE_APP_SP_CLIENT_SECRET,
-        authCode: '',
-        accessToken: '',
-        refreshToken: ''
+        authCode: storedAuth.authCode || '',
+        accessToken: storedAuth.accessToken || '',
+        refreshToken: storedAuth.refreshToken || ''
       },
       endpoints: {
         auth: 'https://accounts.spotify.com/authorize',
@@ -63,18 +65,13 @@ export default {
      * @return {String}
      */
     getCurrentComponent() {
-  if (this.isDevelopment) {
-    return 'NowPlaying'
-  }
-      
-  return this.auth.status === false ? 'Authorise' : 'NowPlaying'
-}
-  },
+      if (this.isDevelopment) {
+        return 'NowPlaying'
+      }
 
-  created() {
-    this.auth = {
-      ...this.auth,
-      ...getStoredAuth()
+      return this.auth.status || this.auth.accessToken || this.auth.refreshToken
+        ? 'NowPlaying'
+        : 'Authorise'
     }
   },
 

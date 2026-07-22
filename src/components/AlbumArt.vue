@@ -29,7 +29,7 @@ export default {
 }
 
 .album-art__image {
-  width: min(100%, 460px);
+  width: min(100%, 420px);
   aspect-ratio: 1;
   object-fit: cover;
 

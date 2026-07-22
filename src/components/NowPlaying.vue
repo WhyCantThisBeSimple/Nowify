@@ -74,7 +74,8 @@ export default {
     return {
       pollPlaying: "",
       colourPalette: "",
-      swatches: []
+      swatches: [],
+      lastTrackSignature: ""
     }
   },
 
@@ -98,22 +99,23 @@ export default {
         )
 
         const data = normalizeCurrentlyPlaying(response)
+        const trackSignature = this.getTrackSignature(data)
+        const shouldRefreshPalette = trackSignature !== this.lastTrackSignature
 
         this.$emit("spotifyTrackUpdated", data)
 
-        this.$nextTick(() => {
-          this.getAlbumColours()
-        })
+        if (shouldRefreshPalette) {
+          this.lastTrackSignature = trackSignature
+          this.$nextTick(() => {
+            this.getAlbumColours()
+          })
+        }
       } catch (error) {
         this.handleExpiredToken()
 
         const data = getEmptyPlayer()
 
         this.$emit("spotifyTrackUpdated", data)
-
-        this.$nextTick(() => {
-          this.getAlbumColours()
-        })
       }
     },
 
@@ -121,6 +123,16 @@ export default {
       return this.player.playing
         ? "now-playing--active"
         : "now-playing--idle"
+    },
+
+    getTrackSignature(player = {}) {
+      const album = player.trackAlbum || {}
+      const artists = Array.isArray(player.trackArtists)
+        ? player.trackArtists.join("|")
+        : ""
+
+      return [player.trackTitle || "", artists, album.title || "", album.image || ""]
+        .join("|")
     },
 
     getAlbumColours() {
@@ -166,9 +178,10 @@ export default {
         }))
 
       this.swatches = albumColours
-
-      this.colourPalette =
-        albumColours[Math.floor(Math.random() * albumColours.length)]
+      this.colourPalette = albumColours[0] || {
+        text: "#ffffff",
+        background: "#1e1e1e"
+      }
 
       this.$nextTick(() => {
         this.setAppColours()
@@ -193,13 +206,18 @@ export default {
     },
 
     player: {
-      handler() {
-        this.$nextTick(() => {
-          this.getAlbumColours()
-        })
+      handler(newVal, oldVal) {
+        const oldSignature = this.getTrackSignature(oldVal)
+        const newSignature = this.getTrackSignature(newVal)
+
+        if (newSignature && newSignature !== oldSignature) {
+          this.lastTrackSignature = newSignature
+          this.$nextTick(() => {
+            this.getAlbumColours()
+          })
+        }
       },
-      deep: true,
-      immediate: true
+      deep: true
     }
   }
 }
